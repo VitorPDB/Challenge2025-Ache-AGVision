@@ -1,0 +1,248 @@
+:root{
+  --bg: #f7f8fb;
+  --card: #f3f5f9;
+  --bubble: #f6f7fb;
+  --text: #111827;
+  --muted: #6b7280;
+  --brand: #111827;
+  --pink: #fde7ef;
+  --primary: #5b6bfa;
+  --user-icon: #ef4444; 
+  --bot-icon: #f59e0b;    /* Amarelo pro bot */
+  --success-green: #22c55e;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --shadow: 0 6px 20px rgba(17,24,39,.06);
+}
+
+/* --- NOVO: Animação de Pulse --- */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+/* --- Fim da Nova Mudança --- */
+
+
+* { box-sizing: border-box }
+html,body{ height:100% }
+body{
+  margin:0;
+  font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  
+  /* NOVO: Garante que o body ocupe a tela toda */
+  min-height: 100vh;
+}
+
+/* Top small bar */
+.topbar{
+  position: fixed;
+  top: 0; right: 0; left: 0;
+  height: 44px;
+  display:flex; align-items:center; justify-content:flex-end;
+  padding: 0 18px;
+  color: var(--muted);
+  font-size: 13px;
+  gap: 12px;
+  pointer-events:none;
+  z-index: 10; /* Para ficar acima de tudo */
+}
+.topbar .dots span{
+  display:inline-block; width:4px; height:4px; border-radius:999px;
+  background:#cfd5e3; margin-left:4px;
+}
+.topbar .status{
+  display:flex; align-items:center; gap:8px;
+  /* NOVO: Escondido por padrão, o JS vai mostrar */
+  display: none; 
+}
+.topbar .status .dot{
+  width:8px; height:8px; border-radius:999px;
+  /* NOVO: Cor padrão agora é o amarelo do bot */
+  background: var(--bot-icon); 
+}
+
+/* NOVO: Classe para o ponto de erro */
+.topbar .status .dot.is-error {
+  background: var(--user-icon); /* Vermelho */
+}
+
+/* NOVO: Classe para o ponto de sucesso (se precisarmos) */
+.topbar .status .dot.is-success {
+  background: var(--success-green);
+}
+
+/* NOVO: Classe para aplicar a animação */
+.topbar .status .dot.is-pulsing {
+  animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+
+/* NOVA ESTRUTURA DE LAYOUT (FLEX)
+  Para forçar o composer para baixo 
+*/
+.shell{
+  max-width: 1100px;
+  margin: 0 auto; /* Remove margem de cima/baixo */
+  padding: 0 20px;
+  
+  /* NOVO: Layout Flex */
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Ocupa 100% da altura da tela */
+}
+
+/* Header */
+.hero {
+  /* NOVO: Encolhe mas não cresce */
+  flex-shrink: 0;
+  padding-top: 72px; /* Adiciona o padding que estava no margin */
+}
+.hero .brand{
+  display:flex; align-items:center; gap:12px;
+}
+.hero .logo{
+  color:#111827;
+  display:grid; place-items:center;
+  width:40px; height:40px; border-radius:12px;
+  background:white; box-shadow: var(--shadow);
+}
+.hero h1{
+  margin:0;
+  font-size: clamp(22px, 3vw, 36px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.hero .sub{
+  margin: 10px 0 22px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* Chat window (feed de mensagens) */
+.chat-window{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  padding-bottom: 16px;
+
+  /* NOVO: Faz o chat crescer para ocupar o espaço */
+  flex-grow: 1;
+  overflow-y: auto;
+  min-height: 100px; /* altura mínima */
+}
+
+/* Cada linha de mensagem vira um “cartão” bem leve */
+.row{
+  display:flex;
+}
+.row .bubble{
+  width: 100%;
+  background: #fff;
+  box-shadow: 0 1px 0 rgba(17,24,39,.04);
+  border-radius: 14px;
+}
+.row .bubble-inner{
+  display:flex; align-items:flex-start; gap:12px;
+  padding: 14px 16px;
+}
+.bubble-icon{
+  flex: 0 0 auto;
+  width: 28px; height: 28px; border-radius: 10px;
+  display:grid; place-items:center;
+  color: #fff;
+}
+.bubble-icon.user{ background: var(--user-icon); }
+.bubble-icon.assistant{ background: var(--bot-icon); }
+
+.bubble-text{
+  line-height: 1.6;
+  color: var(--text);
+  font-size: 15px;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+.bubble-text a {
+  color: var(--primary);
+  text-decoration: underline;
+  font-weight: 500;
+}
+.bubble-text a:hover {
+  text-decoration: none;
+}
+
+
+/* Composer rosinha estilo barra inteira */
+.composer-wrap{
+  /* NOVO: Não cresce nem encolhe */
+  flex-grow: 0;
+  flex-shrink: 0;
+
+  position: sticky;
+  bottom: 0;
+  background: var(--bg);
+  
+  /* NOVO: Garante padding na parte de baixo */
+  padding: 8px 10px 24px 10px; 
+  margin: 0 -10px;
+}
+.composer{
+  display:flex; align-items:center;
+  gap: 10px;
+  width: 100%;
+  background: var(--pink);
+  border-radius: 999px;
+  padding: 12px 12px 12px 16px;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.02);
+}
+.composer input{
+  border: none;
+  outline: none;
+  background: transparent;
+  width: 100%;
+  font-size: 15px;
+  color: var(--text);
+}
+.composer input::placeholder{ color:#b36a83; }
+.composer button{
+  border: none;
+  outline: none;
+  background: #fff;
+  width: 44px; height: 44px;
+  border-radius: 999px;
+  display:grid; place-items:center;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: transform .06s ease;
+}
+.composer button:hover{ transform: translateY(-1px) }
+.composer button:disabled{
+  opacity:.6; cursor:not-allowed;
+}
+.composer button.is-sending svg{
+  animation: send 0.9s infinite ease-in-out;
+}
+@keyframes send {
+  0%{ transform: translateX(0) }
+  50%{ transform: translateX(2px) }
+  100%{ transform: translateX(0) }
+}
+
+/* Responsivo */
+@media (max-width: 640px){
+  .shell{ 
+    padding: 0 10px; /* Menos padding lateral no mobile */
+    height: auto; /* Desativa o flex vh em telas pequenas */
+    min-height: 100vh;
+  }
+  .hero {
+    padding-top: 64px;
+  }
+  .bubble-text{ font-size: 14.5px }
+  .composer-wrap{
+    margin: 0;
+    padding: 8px 0 16px 0; /* Padding menor no mobile */
+  }
+}
+

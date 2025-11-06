@@ -1,0 +1,26 @@
+[
+  {
+    "id": "func1",
+    "name": "Funcionário Demo",
+    "email": "func@demo",
+    "password": "scrypt:32768:8:1$AUp5IxOlWKK1ekBt$caa7efaf67ce5b1f714fcaf0aad3a73472ab6553ff26c7119d0f2d04a81892ab6ac02c7e7718ad666f44b7429e6e19a0bebdb1e3fc57802b1333966a4bf5ca4f",
+    "role": "funcionario",
+    "active": true
+  },
+  {
+    "id": "gest1",
+    "name": "Gestor Demo",
+    "email": "gestor@demo",
+    "password": "scrypt:32768:8:1$XtyXOXQj6LqpY0hW$3bdb610b6e500fdb5eeff04360f00e7bde7a9fa6a22e3f7c242cc5cfb48bc1479e5a5afb2705130d4cd8f9f41291cbbf94bbd5cc4b26a8ef069eafddd91760c6",
+    "role": "gestor",
+    "active": true
+  },
+  {
+    "id": "sup1",
+    "name": "Supervisor Demo",
+    "email": "supervisor@demo",
+    "password": "scrypt:32768:8:1$wc5ZcoILGGHALz5q$45d283d746fc60d2976b9fd6118e6a2f604686113bada0ef31a3dd1bab2bb3d5a28fc53c77de8abe3d7728ea59f4f40e8cfea57a6599efe471d4ee53aa9f874c",
+    "role": "supervisor",
+    "active": true
+  }
+]

@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login • AGVision</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #d63384;
+      --primary-light: #ff6ba9;
+      --primary-dark: #b3256e;
+      --success: #2ecc71;
+      --error: #e03131;
+      --text: #1a1a1a;
+      --text-light: #6b6b6b;
+      --border: rgba(255, 255, 255, 0.2);
+      --glass: rgba(255, 255, 255, 0.1);
+      --glass-dark: rgba(0, 0, 0, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      background: #f5f5f5;
+    }
+
+    /* Background com imagem */
+    .bg-wrapper {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .bg-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(0.7) blur(2px);
+      transform: scale(1.1);
+    }
+
+    .bg-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(214, 51, 132, 0.6), rgba(179, 37, 110, 0.7));
+    }
+
+    /* Cursor interativo */
+    #cursor-glow {
+      position: fixed;
+      width: 400px;
+      height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 107, 169, 0.3), transparent 70%);
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      transition: opacity 0.3s ease;
+      z-index: 1;
+      opacity: 0;
+    }
+
+    /* Partículas flutuantes */
+    .particle {
+      position: fixed;
+      width: 4px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1;
+      animation: float 3s infinite ease-in-out;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
+      50% { opacity: 1; }
+    }
+
+    /* Container principal */
+    .login-container {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 420px;
+      animation: slideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Card glassmorphism */
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    /* Logo minimalista */
+    .brand {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 32px;
+      text-align: center;
+    }
+
+    .logo {
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      transition: transform 0.3s ease;
+    }
+
+    .logo:hover {
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    .logo svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 4px 12px rgba(214, 51, 132, 0.4));
+    }
+
+    .brand-text h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text);
+      margin: 0;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-text p {
+      font-size: 15px;
+      color: var(--text-light);
+      margin: 8px 0 0;
+    }
+
+    /* Formulário minimalista */
+    .form-group {
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+      transition: color 0.2s ease;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      font-size: 15px;
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--text);
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: white;
+      box-shadow: 0 0 0 4px rgba(214, 51, 132, 0.1);
+    }
+
+    input::placeholder {
+      color: #999;
+    }
+
+    /* Botão minimalista */
+    button {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: white;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 16px rgba(214, 51, 132, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      position: relative;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(214, 51, 132, 0.4);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-text,
+    .spinner {
+      position: relative;
+    }
+
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+
+    button:disabled .spinner {
+      display: block;
+    }
+
+    button:disabled .btn-text {
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Mensagens */
+    .msg {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      text-align: center;
+      display: none;
+      animation: messageSlide 0.4s ease;
+    }
+
+    @keyframes messageSlide {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .msg.show {
+      display: block;
+    }
+
+    .msg.success {
+      background: rgba(46, 204, 113, 0.15);
+      color: var(--success);
+      border: 1px solid rgba(46, 204, 113, 0.3);
+    }
+
+    .msg.error {
+      background: rgba(224, 49, 49, 0.15);
+      color: var(--error);
+      border: 1px solid rgba(224, 49, 49, 0.3);
+    }
+
+    /* Demo minimalista */
+    .demo {
+      margin-top: 24px;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.03);
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .demo strong {
+      display: block;
+      color: var(--text);
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+
+    .demo-item {
+      color: var(--text-light);
+      margin: 4px 0;
+    }
+
+    code {
+      background: rgba(214, 51, 132, 0.1);
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9em;
+      color: var(--primary-dark);
+    }
+
+    /* Footer minimalista */
+    .footer {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-light);
+    }
+
+    /* Responsividade */
+    @media (max-width: 480px) {
+      .card {
+        padding: 32px 24px;
+        border-radius: 20px;
+      }
+
+      .logo {
+        width: 64px;
+        height: 64px;
+      }
+
+      .brand-text h1 {
+        font-size: 24px;
+      }
+
+      #cursor-glow {
+        display: none;
+      }
+    }
+
+    /* Reduzir movimento */
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Background -->
+  <div class="bg-wrapper">
+    <img src="https://i.imgur.com/8QZ6H3K.jpg" alt="" class="bg-image" />
+    <div class="bg-overlay"></div>
+  </div>
+
+  <!-- Cursor glow effect -->
+  <div id="cursor-glow"></div>
+
+  <!-- Login -->
+  <div class="login-container">
+    <div class="card">
+      <div class="brand">
+        <div class="logo">
+          <svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+            <!-- Órbitas simplificadas -->
+            <ellipse cx="128" cy="128" rx="85" ry="45" fill="none" stroke="#d63384" stroke-width="6" opacity="0.8"/>
+            <ellipse cx="128" cy="128" rx="85" ry="45" fill="none" stroke="#d63384" stroke-width="6" opacity="0.8" transform="rotate(60 128 128)"/>
+            <ellipse cx="128" cy="128" rx="85" ry="45" fill="none" stroke="#d63384" stroke-width="6" opacity="0.8" transform="rotate(120 128 128)"/>
+            
+            <!-- Nós nas interseções -->
+            <circle cx="128" cy="83" r="8" fill="white" stroke="#d63384" stroke-width="3"/>
+            <circle cx="128" cy="173" r="8" fill="white" stroke="#d63384" stroke-width="3"/>
+            <circle cx="91" cy="113" r="8" fill="white" stroke="#d63384" stroke-width="3"/>
+            <circle cx="165" cy="113" r="8" fill="white" stroke="#d63384" stroke-width="3"/>
+            <circle cx="91" cy="143" r="8" fill="white" stroke="#d63384" stroke-width="3"/>
+            <circle cx="165" cy="143" r="8" fill="white" stroke="#d63384" stroke-width="3"/>
+            
+            <!-- Olho central -->
+            <ellipse cx="128" cy="128" rx="26" ry="18" fill="none" stroke="#d63384" stroke-width="5"/>
+            <circle cx="128" cy="128" r="7" fill="#d63384"/>
+            <circle cx="128" cy="128" r="3" fill="white"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>AGVision</h1>
+          <p>Acesse o sistema com sua conta</p>
+        </div>
+      </div>
+
+      <form id="login-form">
+        <div class="form-group">
+          <label for="email">E-mail</label>
+          <div class="input-wrapper">
+            <input 
+              id="email" 
+              name="email" 
+              type="email" 
+              placeholder="seu.email@exemplo.com" 
+              autocomplete="username" 
+              required 
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Senha</label>
+          <div class="input-wrapper">
+            <input 
+              id="password" 
+              name="password" 
+              type="password" 
+              placeholder="••••••••" 
+              autocomplete="current-password" 
+              required 
+            />
+          </div>
+        </div>
+
+        <button id="btn-login" type="submit">
+          <span class="btn-text">
+            <i class="fas fa-arrow-right"></i>
+            Entrar
+          </span>
+          <span class="spinner"></span>
+        </button>
+
+        <div id="msg" class="msg"></div>
+
+        <div class="demo">
+          <strong>Contas de teste disponíveis:</strong>
+          <div class="demo-item">• Funcionário: <code>func@demo</code></div>
+          <div class="demo-item">• Gestor: <code>gestor@demo</code></div>
+          <div class="demo-item">• Supervisor: <code>supervisor@demo</code></div>
+          <div class="demo-item">• Senha: <code>123456</code></div>
+        </div>
+      </form>
+
+      <div class="footer">
+        Challenge2025 • Login seguro
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='login.js') }}"></script>
+  <script>
+    // Cursor glow effect
+    const cursorGlow = document.getElementById('cursor-glow');
+    let mouseX = 0, mouseY = 0;
+    let glowX = 0, glowY = 0;
+
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      cursorGlow.style.opacity = '1';
+    });
+
+    document.addEventListener('mouseleave', () => {
+      cursorGlow.style.opacity = '0';
+    });
+
+    // Smooth glow movement
+    function animateGlow() {
+      glowX += (mouseX - glowX) * 0.1;
+      glowY += (mouseY - glowY) * 0.1;
+      cursorGlow.style.left = glowX + 'px';
+      cursorGlow.style.top = glowY + 'px';
+      requestAnimationFrame(animateGlow);
+    }
+    animateGlow();
+
+    // Partículas flutuantes
+    function createParticles() {
+      const container = document.body;
+      for (let i = 0; i < 15; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.top = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 3 + 's';
+        particle.style.animationDuration = (Math.random() * 2 + 3) + 's';
+        container.appendChild(particle);
+      }
+    }
+    createParticles();
+  </script>
+</body>
+</html>

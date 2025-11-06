@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <title>Documento de Auxílio</title>
+  <style>
+    body {
+      background: linear-gradient(to bottom right, #fde4e4 0%, #fff 50%, #b71356 100%);
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #b71356;
+    }
+    header {
+      background-color: #fff;
+      padding: 30px 0 10px 0;
+      text-align: center;
+      box-shadow: 0 3px 10px #fde4e4;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2.8em;
+    }
+    .container {
+      max-width: 600px;
+      margin: 35px auto;
+      background-color: #fff;
+      border-radius: 18px;
+      box-shadow: 0 5px 30px #b71356;
+      padding: 40px 32px;
+      text-align: center;
+    }
+    .doc-icon {
+      font-size: 3.5em;
+      color: #f68fb4;
+      margin-bottom: 20px;
+    }
+    .button {
+      background-color: #b71356;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 16px 38px;
+      font-size: 1.1em;
+      margin-top: 25px;
+      cursor: pointer;
+      transition: background .3s;
+    }
+    .button:hover {
+      background-color: #f68fb4;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Documento de Auxílio</h1>
+    <p>Esta pagina é uma representação de como o link do documento seria aberto pela pagina de gestão de tarefas</p>
+  </header>
+  
+  <div class="container">
+    <div class="doc-icon">📎</div>
+    <h2>Precisa de Ajuda?</h2>
+    <p>
+      O documento nesta pagina é referente à tarefa <strong id="subtitulo-tarefa">—</strong> e possui informações importantes, leia-o atentamente.
+    </p>
+    <button class="button">Abrir Documento</button>
+  </div>
+
+    <!-- dentro do .container, logo abaixo do <h2> ou antes do botão -->
+    <div id="task-meta" style="background:#fde4e4;border-left:5px solid #b71356;border-radius:10px;padding:12px 14px;margin:10px 0;text-align:left;color:#b71356;font-weight:600">
+    <!-- preenchido via JS -->
+    </div>
+
+    <script>
+    (function(){
+        const q = new URLSearchParams(location.search);
+        const numero = q.get('numero') || '—';
+        const nome   = q.get('nome') || '—';
+        const fase   = q.get('fase') || '—';
+        const cat    = q.get('categoria') || '—';
+        const sheet  = q.get('sheet') || '—';
+        const el = document.getElementById('task-meta');
+        if (el) {
+        el.textContent = `Tarefa selecionada: Nº ${numero} • ${nome} • ${fase} • ${cat} • Aba: ${sheet}`;
+        }
+    })();
+    </script>
+
+    <script>
+    (function(){
+        const q = new URLSearchParams(location.search);
+        const nome = (q.get('nome') || '').trim();
+        const alvo = document.getElementById('subtitulo-tarefa');
+        if (alvo) alvo.textContent = nome || '—';
+
+        // Se você tiver aquela faixa "task-meta" mostrando tudo,
+        // esconda-a para ficar só com o subtítulo:
+        const meta = document.getElementById('task-meta');
+        if (meta) meta.style.display = 'none';
+    })();
+    </script>
+
+
+</body>
+</html>

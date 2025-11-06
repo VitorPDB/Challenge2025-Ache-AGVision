@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta name="supervisor-url" content="/supervisor">
+  <meta name="api-base" content="/chatbot/">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chatbot - Assistente de Dados</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      /* Sistema de cores rosa */
+      --primary-50: #fff5f9;
+      --primary-100: #ffe6ef;
+      --primary-200: #ffc9de;
+      --primary-300: #ff9ec4;
+      --primary-400: #f56aa4;
+      --primary-500: #d63384;
+      --primary-600: #b3256e;
+      --primary-700: #8f1e58;
+
+      /* Cores semânticas */
+      --success-500: #2ecc71;
+      --warning-500: #f0ad4e;
+      --error-500: #e03131;
+      --info-500: #3498db;
+
+      /* Superfícies e bordas */
+      --surface: #ffffff;
+      --surface-2: #faf9fb;
+      --surface-3: #f6f3f7;
+      --border: #eadfea;
+      --text-strong: #2b2730;
+      --text: #4a1d2f;
+      --text-muted: #6b5c66;
+
+      /* Sombras */
+      --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.06);
+      --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.10);
+
+      /* Espaçamento */
+      --spacing-xs: 4px;
+      --spacing-sm: 8px;
+      --spacing-md: 16px;
+      --spacing-lg: 24px;
+      --spacing-xl: 32px;
+
+      /* Tipografia */
+      --text-xs: 12px;
+      --text-sm: 14px;
+      --text-base: 16px;
+      --text-lg: 18px;
+      --text-xl: 20px;
+      --text-2xl: 24px;
+
+      /* Raios */
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-full: 999px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, var(--primary-50) 0%, #fff 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.6;
+    }
+
+    /* HEADER */
+    header {
+      background: var(--surface);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--spacing-lg) var(--spacing-xl);
+      box-shadow: var(--shadow-sm);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+    }
+
+    .logo-icon {
+      font-size: 28px;
+      color: var(--primary-500);
+      filter: drop-shadow(0 2px 4px rgba(214, 51, 132, 0.15));
+    }
+
+    .logo {
+      font-size: var(--text-2xl);
+      font-weight: 700;
+      color: var(--text-strong);
+      letter-spacing: -0.02em;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      padding: 8px 16px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-full);
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .status-badge.online {
+      background: rgba(46, 204, 113, 0.1);
+      border-color: var(--success-500);
+      color: var(--success-500);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* Botões genéricos */
+    .btn {
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      font-size: var(--text-sm);
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: .2s;
+    }
+    .btn:hover { background: var(--surface-2); border-color: var(--primary-300); }
+    .btn-secondary { background: var(--surface-2); }
+    .btn-primary { background: linear-gradient(135deg, var(--primary-500), var(--primary-400)); color: #fff; border: none; }
+
+    /* NOVO: botão compacto ao lado do Enviar */
+    .btn-icon {                /* NOVO */
+      width: 50px;
+      min-width: 50px;
+      height: 50px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* CONTAINER PRINCIPAL */
+    .chat-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: var(--spacing-lg);
+      gap: var(--spacing-lg);
+    }
+
+    /* ÁREA DE MENSAGENS */
+    .messages-wrapper {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .messages-header {
+      padding: var(--spacing-md) var(--spacing-lg);
+      background: var(--surface-2);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--spacing-md);
+      flex-wrap: wrap;
+    }
+
+    .messages-header h3 {
+      font-size: var(--text-lg);
+      font-weight: 700;
+      color: var(--text-strong);
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+    }
+
+    .messages-actions {
+      display: flex;
+      gap: var(--spacing-sm);
+      align-items: center;
+    }
+
+    .btn-clear {
+      padding: 8px 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+    }
+
+    .btn-clear:hover {
+      background: var(--surface-2);
+      border-color: var(--primary-300);
+    }
+
+    #messages {
+      /* antes havia min-height: 400px; max-height: 600px; */
+      flex: 1;
+      min-height: 0;            /* permite que o flex filho use 100% da altura do wrapper */
+      overflow-y: auto;
+      padding: var(--spacing-lg);
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-md);
+    }
+
+    /* MENSAGENS */
+    .message {
+      display: flex;
+      gap: var(--spacing-md);
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message.user { flex-direction: row-reverse; }
+
+    .message-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: var(--text-base);
+      font-weight: 600;
+    }
+
+    .message.user .message-avatar {
+      background: linear-gradient(135deg, var(--primary-500), var(--primary-400));
+      color: white;
+    }
+
+    .message.assistant .message-avatar {
+      background: var(--surface-2);
+      color: var(--primary-500);
+      border: 2px solid var(--border);
+    }
+
+    .message-content { flex: 1; max-width: 70%; }
+
+    .message-bubble {
+      padding: var(--spacing-md) var(--spacing-lg);
+      border-radius: var(--radius-md);
+      font-size: var(--text-base);
+      line-height: 1.6;
+      word-wrap: break-word;
+    }
+
+    .message.user .message-bubble {
+      background: linear-gradient(135deg, var(--primary-500), var(--primary-400));
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+
+    .message.assistant .message-bubble {
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 4px;
+    }
+
+    .message-bubble a {
+      color: var(--primary-600);
+      text-decoration: underline;
+      font-weight: 600;
+    }
+    .message.user .message-bubble a { color: white; text-decoration: underline; }
+
+    .message-time {
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      margin-top: var(--spacing-xs);
+      padding: 0 var(--spacing-sm);
+    }
+    .message.user .message-time { text-align: right; }
+
+    /* ESTADO VAZIO */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: var(--spacing-xl);
+      height: 100%;
+      color: var(--text-muted);
+    }
+
+    .empty-state i {
+      font-size: 64px;
+      color: var(--primary-200);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .empty-state h3 {
+      font-size: var(--text-xl);
+      font-weight: 700;
+      color: var(--text-strong);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .empty-state p { font-size: var(--text-base); max-width: 400px; }
+
+    .suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-sm);
+      justify-content: center;
+      margin-top: var(--spacing-lg);
+    }
+
+    .suggestion-chip {
+      padding: 10px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-full);
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+    }
+
+    .suggestion-chip:hover {
+      background: var(--primary-50);
+      border-color: var(--primary-300);
+      color: var(--primary-600);
+      transform: translateY(-1px);
+    }
+
+    /* INDICADOR DE DIGITAÇÃO */
+    .typing-indicator { display: flex; gap: var(--spacing-md); padding: var(--spacing-md) 0; }
+
+    .typing-dots {
+      display: flex;
+      gap: 6px;
+      padding: var(--spacing-md) var(--spacing-lg);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+    }
+
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--primary-500);
+      animation: typing 1.4s infinite;
+    }
+
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes typing {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.7; }
+      30% { transform: translateY(-10px); opacity: 1; }
+    }
+
+    /* ÁREA DE INPUT */
+    .input-wrapper {
+      position: relative; /* NOVO: para overlay */
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: var(--spacing-lg);
+    }
+
+    .input-container {
+      display: flex;
+      gap: var(--spacing-md);
+      align-items: flex-end;
+    }
+
+    #user-input {
+      flex: 1;
+      padding: var(--spacing-md) var(--spacing-lg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: var(--text-base);
+      background: var(--surface);
+      color: var(--text);
+      resize: vertical;
+      min-height: 50px;
+      max-height: 150px;
+      font-family: inherit;
+      line-height: 1.5;
+      transition: all 0.2s ease;
+    }
+
+    #user-input:focus {
+      outline: none;
+      border-color: var(--primary-500);
+      box-shadow: 0 0 0 3px rgba(214, 51, 132, 0.12);
+    }
+
+    #user-input::placeholder { color: var(--text-muted); }
+
+    .btn-send {
+      padding: var(--spacing-md) var(--spacing-xl);
+      background: linear-gradient(135deg, var(--primary-500), var(--primary-400));
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: var(--text-base);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      box-shadow: var(--shadow-sm);
+      height: 50px;
+    }
+
+    .btn-send:hover:not(:disabled) { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .btn-send:active:not(:disabled) { transform: translateY(0); }
+    .btn-send:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .input-hint {
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      margin-top: var(--spacing-sm);
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+    }
+
+    /* SCROLLBAR */
+    #messages::-webkit-scrollbar { width: 8px; }
+    #messages::-webkit-scrollbar-track { background: var(--surface-2); border-radius: var(--radius-sm); }
+    #messages::-webkit-scrollbar-thumb { background: var(--primary-300); border-radius: var(--radius-sm); }
+    #messages::-webkit-scrollbar-thumb:hover { background: var(--primary-400); }
+
+    /* MODAL UPLOAD */
+    .hidden { display: none; }
+    .modal {
+      position: fixed; inset: 0; z-index: 1000;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,.35);
+      padding: 20px;
+    }
+    /* Força o fechamento quando tiver a classe hidden */
+    .modal.hidden { display: none !important; }
+
+    .modal-content {
+      width: min(640px, 96vw);
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+    }
+    .modal-header, .modal-footer {
+      padding: 14px 18px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .modal-footer { border-bottom: none; border-top: 1px solid var(--border); }
+    .modal-body { padding: 16px 18px; display: grid; gap: 12px; }
+    .modal-header h3 { font-size: var(--text-lg); font-weight: 800; color: var(--text-strong); }
+
+    .field { display: grid; gap: 6px; }
+    .field label { font-weight: 700; color: var(--text-strong); font-size: var(--text-sm); }
+    .field input[type="file"],
+    .field select {
+      width: 100%; padding: 10px 12px; border-radius: var(--radius-md);
+      border: 1px solid var(--border); background: var(--surface);
+      color: var(--text);
+    }
+    .radio-row { display: flex; gap: 16px; flex-wrap: wrap; }
+    .hint { color: var(--text-muted); font-size: var(--text-sm); }
+    .status { font-size: var(--text-sm); }
+    .status.ok { color: var(--success-500); }
+    .status.err { color: var(--error-500); }
+
+    .close {
+      border: none; background: transparent; color: var(--text-muted);
+      font-size: 20px; cursor: pointer; padding: 2px 6px; border-radius: var(--radius-sm);
+    }
+    .close:hover { background: var(--surface-3); color: var(--text-strong); }
+
+    /* NOVO: Overlay de drag-and-drop */
+    .drop-overlay {                   /* NOVO */
+      position: absolute; inset: 0;
+      border: 2px dashed var(--primary-400);
+      border-radius: var(--radius-lg);
+      background: rgba(245,106,164,.06);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      color: var(--primary-600); font-weight: 700;
+      pointer-events: none; opacity: 0; transition: opacity .15s ease;
+    }
+    .drop-overlay.visible { opacity: 1; }     /* NOVO */
+    .input-wrapper.drop-target {              /* NOVO */
+      border-color: var(--primary-400);
+      box-shadow: 0 0 0 3px rgba(214,51,132,.12);
+    }
+
+    /* RESPONSIVIDADE */
+    @media (max-width: 768px) {
+      .chat-container { padding: var(--spacing-md); }
+      header { padding: var(--spacing-md); flex-wrap: wrap; gap: var(--spacing-sm); }
+      .logo { font-size: var(--text-xl); }
+      .logo-icon { font-size: 24px; }
+      #messages { min-height: 300px; max-height: 500px; }
+      .message-content { max-width: 85%; }
+      .input-container { flex-direction: column; }
+      .btn-send, .btn-icon { width: 100%; justify-content: center; } /* NOVO */
+      .suggestions { flex-direction: column; }
+      .suggestion-chip { width: 100%; justify-content: center; }
+    }
+
+    /* MOTION PREFERENCES */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+    }
+
+    /* LOADING STATE */
+    .loading { position: relative; pointer-events: none; }
+    .loading::after {
+      content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: 18px; height: 18px; border: 2px solid transparent; border-top: 2px solid white; border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+    @keyframes spin { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
+
+    /* CODE BLOCKS */
+    .message-bubble pre { background: rgba(0, 0, 0, 0.05); padding: var(--spacing-md); border-radius: var(--radius-sm); overflow-x: auto; margin: var(--spacing-sm) 0; }
+    .message-bubble code { font-family: 'Courier New', monospace; font-size: var(--text-sm); }
+    .message-bubble strong { font-weight: 700; color: var(--text-strong); }
+    .message.user .message-bubble strong { color: white; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo-container">
+      <i class="fas fa-robot logo-icon"></i>
+      <div class="logo">Chatbot</div>
+    </div>
+
+    <div class="header-actions">
+      <!-- Botão para Voltar -->
+      <button id="btnBack" class="btn">Voltar</button>
+
+      <!-- Botão para abrir o modal (mantido) -->
+      <button id="btnUploadXlsx" class="btn">
+        <i class="fas fa-file-upload"></i>
+        Importar XLSX
+      </button>
+
+      <div class="status-badge" id="status-badge">
+        <span class="status-dot"></span>
+        <span id="status-text">{{ status_text }}</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="chat-container">
+    <div class="messages-wrapper">
+      <div class="messages-header">
+        <h3>
+          <i class="fas fa-comments"></i>
+          Conversa
+        </h3>
+        <div class="messages-actions">
+          <button class="btn-clear" id="clear-chat-btn">
+            <i class="fas fa-trash-alt"></i>
+            Limpar
+          </button>
+        </div>
+      </div>
+
+      <div id="messages">
+        <div class="empty-state" id="empty-state">
+          <i class="fas fa-robot"></i>
+          <h3>Olá! Como posso ajudar?</h3>
+          <p>Faça perguntas sobre suas tarefas, projetos e documentos.</p>
+
+          <div class="suggestions">
+            <button class="suggestion-chip" data-suggestion="Quantas tarefas críticas estão abertas?">
+              <i class="fas fa-exclamation-triangle"></i>
+              Tarefas críticas
+            </button>
+            <button class="suggestion-chip" data-suggestion="Liste todos os projetos">
+              <i class="fas fa-project-diagram"></i>
+              Ver projetos
+            </button>
+            <button class="suggestion-chip" data-suggestion="Quais tarefas estão próximas de vencer?">
+              <i class="fas fa-calendar-alt"></i>
+              Prazos próximos
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-wrapper" id="chatDropArea"> <!-- NOVO id para drop -->
+      <!-- NOVO overlay de drop -->
+      <div class="drop-overlay" id="dropOverlay">
+        <i class="fas fa-file-excel"></i> Solte o arquivo <strong>.xlsx</strong> aqui para importar
+      </div>
+
+      <div class="input-container">
+        <textarea
+          id="user-input"
+          placeholder="Digite sua pergunta aqui..."
+          rows="1"
+        ></textarea>
+
+        <button class="btn-send" id="send-btn">
+          <i class="fas fa-paper-plane"></i>
+          Enviar
+        </button>
+
+        <!-- NOVO: botão compacto ao lado do enviar -->
+        <button id="btnUploadXlsxInline" class="btn-icon btn-primary" title="Importar XLSX" aria-label="Importar XLSX">
+          <i class="fas fa-file-upload"></i>
+        </button>
+      </div>
+      <div class="input-hint">
+        <i class="fas fa-info-circle"></i>
+        Pressione Shift+Enter para nova linha ou Enter para enviar. Dica: arraste um <b>.xlsx</b> para esta área para importar.
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Upload XLSX -->
+  <div id="modalUpload" class="modal hidden" aria-hidden="true">
+    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="uploadTitle">
+      <div class="modal-header">
+        <h3 id="uploadTitle">Importar XLSX para Projeto</h3>
+        <button type="button" id="closeUpload" class="close" aria-label="Fechar">&times;</button>
+      </div>
+
+      <form id="uploadForm" enctype="multipart/form-data">
+        <div class="modal-body">
+          <div class="field">
+            <label for="projetoDestino">Projeto de destino</label>
+            <select id="projetoDestino" name="target" required>
+              <option value="">— selecione —</option>
+            </select>
+            <small class="hint">Use esta lista quando for <b>substituir</b> um projeto existente.</small>
+          </div>
+
+          <div class="field">
+            <label>Ação</label>
+            <div class="radio-row">
+              <label><input type="radio" name="modo" value="substituir" checked> Substituir projeto selecionado</label>
+              <label><input type="radio" name="modo" value="novo"> Importar como novo projeto</label>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="xlsxFile">Arquivo .xlsx</label>
+            <input type="file" id="xlsxFile" name="file" accept=".xlsx" required />
+            <small id="dropInfo" class="hint" style="display:none"></small> <!-- NOVO -->
+          </div>
+
+          <div id="uploadHint" class="hint">
+            Dica: para <b>substituir</b>, selecione o projeto e mantenha a opção "Substituir".
+            Para <b>novo</b>, escolha "Importar como novo".
+          </div>
+
+          <div id="uploadStatus" class="status" style="display:none"></div>
+        </div>
+
+        <div class="modal-footer">
+          <div style="display:flex; gap:8px; margin-left:auto;">
+            <button type="button" id="btnCancelarUpload" class="btn">Cancelar</button>
+            <button type="submit" id="btnEnviarXlsx" class="btn btn-primary">Enviar</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Seu JS principal de chat -->
+  <script src="static/js/script.js"></script>
+
+  <!-- JS mínimo para o modal de Upload (.xlsx) + drag-and-drop -->
+  <script>
+    (function() {
+      const $ = (sel) => document.querySelector(sel);
+
+      /* NOVO: guarda arquivo vindo de drag&drop sem quebrar o fluxo atual */
+      let droppedFile = null; /* NOVO */
+
+      function toggleDestinoUI() {
+        const modo = document.querySelector('input[name="modo"]:checked')?.value || 'substituir';
+        const sel = $('#projetoDestino');
+        if (!sel) return;
+        if (modo === 'novo') {
+          sel.disabled = true;
+          sel.required = false;
+          sel.title = 'Desabilitado no modo "novo"';
+        } else {
+          sel.disabled = false;
+          sel.required = true;
+          sel.title = '';
+        }
+      }
+
+      /* ALTERADO: aceita arquivo opcional (drag&drop) */
+      function showUploadModal(fileFromDrop = null) {
+        const modal = $('#modalUpload');
+        if (!modal) return;
+        modal.classList.remove('hidden');
+        modal.setAttribute('aria-hidden', 'false');
+
+        // reset do form/estado
+        const form = $('#uploadForm');
+        if (form) form.reset();
+
+        // Default: substituir
+        const radioSub = document.querySelector('input[name="modo"][value="substituir"]');
+        if (radioSub) radioSub.checked = true;
+
+        // NOVO: se vier de drop, força modo "novo" e mostra a info do arquivo
+        droppedFile = (fileFromDrop instanceof File) ? fileFromDrop : null;
+        const radioNovo = document.querySelector('input[name="modo"][value="novo"]');
+        const dropInfo = $('#dropInfo');
+        const fileInput = $('#xlsxFile');
+
+        if (droppedFile) {
+          if (radioNovo) radioNovo.checked = true;
+          if (dropInfo) { dropInfo.style.display = 'block'; dropInfo.textContent = 'Arquivo (arrastar/soltar): ' + droppedFile.name; }
+          if (fileInput) fileInput.value = '';
+        } else {
+          if (dropInfo) { dropInfo.style.display = 'none'; dropInfo.textContent = ''; }
+        }
+
+        toggleDestinoUI();
+        carregarProjetosDestino();
+
+        // limpar status
+        const statusEl = $('#uploadStatus');
+        if (statusEl) {
+          statusEl.style.display = 'none';
+          statusEl.className = 'status';
+          statusEl.textContent = '';
+        }
+      }
+
+      function hideUploadModal() {
+        const modal = $('#modalUpload');
+        if (!modal) return;
+        modal.classList.add('hidden');
+        modal.setAttribute('aria-hidden', 'true');
+        droppedFile = null; // NOVO: limpa arquivo de drop após fechar
+      }
+
+      async function carregarProjetosDestino() {
+        const sel = $('#projetoDestino');
+        if (!sel) return;
+        sel.innerHTML = '<option value="">— carregando —</option>';
+        try {
+          const res = await fetch('/chatbot/api/projetos', { method: 'GET' });
+          const data = await res.json();
+          const list = (data && data.projects) || [];
+          if (!Array.isArray(list) || list.length === 0) {
+            sel.innerHTML = '<option value="">(sem projetos)</option>';
+            return;
+          }
+          sel.innerHTML = '<option value="">— selecione —</option>';
+          list.forEach(nome => {
+            const opt = document.createElement('option');
+            opt.value = nome;
+            opt.textContent = nome;
+            sel.appendChild(opt);
+          });
+        } catch (err) {
+          sel.innerHTML = '<option value="">(erro ao carregar)</option>';
+          console.error('Erro ao listar projetos:', err);
+        }
+      }
+
+      async function enviarXlsx(e) {
+        e.preventDefault();
+        const form = $('#uploadForm');
+        const fileInput = $('#xlsxFile');
+        const modo = form?.querySelector('input[name="modo"]:checked')?.value || 'substituir';
+        const target = $('#projetoDestino')?.value || '';
+        const statusEl = $('#uploadStatus');
+        const btnEnviar = $('#btnEnviarXlsx');
+
+        if (statusEl) {
+          statusEl.style.display = 'block';
+          statusEl.className = 'status';
+          statusEl.textContent = 'Enviando...';
+        }
+        if (btnEnviar) btnEnviar.disabled = true;
+
+        try {
+          /* ALTERADO: prioriza arquivo do drop, senão o input */
+          const fileToSend = droppedFile || (fileInput?.files?.[0] || null); // NOVO
+          if (!fileToSend) {
+            throw new Error('Selecione um arquivo .xlsx.');
+          }
+          if (modo === 'substituir' && !target) {
+            throw new Error('Escolha o projeto de destino para substituir.');
+          }
+
+          const fd = new FormData();
+          fd.append('file', fileToSend); // ALTERADO
+          fd.append('modo', modo);
+          if (target) fd.append('target', target);
+
+          const res = await fetch('/chatbot/api/upload-xlsx', { method: 'POST', body: fd });
+          const data = await res.json();
+
+          if (!res.ok || data.error) {
+            throw new Error(data.error || 'Falha no upload.');
+          }
+
+          if (statusEl) {
+            statusEl.classList.add('ok');
+            statusEl.textContent = (data.action === 'replace')
+              ? `Projeto "${data.project}" atualizado com sucesso. (${data.rows} linhas carregadas)`
+              : `Novo projeto "${data.project}" criado com sucesso. (${data.rows} linhas carregadas)`;
+          }
+
+          // Se tiver uma função global para atualizar a UI, chame aqui:
+          // if (window.carregarTarefas) await window.carregarTarefas();
+
+          setTimeout(hideUploadModal, 900);
+
+        } catch (err) {
+          console.error(err);
+          if (statusEl) {
+            statusEl.classList.add('err');
+            statusEl.textContent = `Erro: ${err.message}`;
+          }
+        } finally {
+          if (btnEnviar) btnEnviar.disabled = false;
+        }
+      }
+
+      /* NOVO: helpers e binding de drag&drop na área da barra de chat */
+      function acceptXlsx(e){                              // NOVO
+        const items = e.dataTransfer?.items || [];
+        for (const it of items){
+          if (it.kind === 'file'){
+            const type = (it.type||'').toLowerCase();
+            const name = (it.getAsFile?.()?.name || '').toLowerCase();
+            if (type.includes('spreadsheetml') || name.endsWith('.xlsx')) return true;
+          }
+        }
+        return false;
+      }
+
+      function wireDragDrop(){                             // NOVO
+        const dropArea = $('#chatDropArea');
+        const overlay = $('#dropOverlay');
+        if (!dropArea || !overlay) return;
+
+        const show = ()=>{ dropArea.classList.add('drop-target'); overlay.classList.add('visible'); }
+        const hide = ()=>{ dropArea.classList.remove('drop-target'); overlay.classList.remove('visible'); }
+
+        ['dragenter','dragover'].forEach(evt=>{
+          dropArea.addEventListener(evt, (e)=>{
+            if (!acceptXlsx(e)) return;
+            e.preventDefault(); e.stopPropagation(); show();
+          });
+        });
+        ['dragleave','dragend'].forEach(evt=>{
+          dropArea.addEventListener(evt, ()=>{ hide(); });
+        });
+        dropArea.addEventListener('drop', (e)=>{
+          e.preventDefault(); e.stopPropagation(); hide();
+          if (!acceptXlsx(e)) return;
+          const f = e.dataTransfer.files?.[0];
+          if (f) showUploadModal(f);
+        });
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        const btnOpen = $('#btnUploadXlsx');
+        if (btnOpen) btnOpen.addEventListener('click', () => showUploadModal());
+
+        /* NOVO: botão ao lado do Enviar */
+        const btnInline = $('#btnUploadXlsxInline');
+        if (btnInline) btnInline.addEventListener('click', () => showUploadModal()); // NOVO
+
+        const btnClose = $('#closeUpload');
+        if (btnClose) btnClose.addEventListener('click', hideUploadModal);
+
+        const btnCancel = $('#btnCancelarUpload');
+        if (btnCancel) btnCancel.addEventListener('click', hideUploadModal);
+
+        const form = $('#uploadForm');
+        if (form) form.addEventListener('submit', enviarXlsx);
+
+        // troca de modo habilita/desabilita select
+        document.querySelectorAll('input[name="modo"]').forEach(r => {
+          r.addEventListener('change', toggleDestinoUI);
+        });
+
+        // fecha ao clicar fora do conteúdo
+        const modal = $('#modalUpload');
+        if (modal) {
+          modal.addEventListener('click', (e) => { if (e.target === modal) hideUploadModal(); });
+        }
+        // fecha com ESC
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') hideUploadModal();
+        });
+
+        // NOVO: ativa drag&drop na barra de chat
+        wireDragDrop(); // NOVO
+      });
+    })();
+  </script>
+</body>
+</html>

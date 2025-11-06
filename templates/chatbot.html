@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <!-- NOVO TÍTULO -->
+  <title>Chatbot ACHE</title>
+
+  <!-- Inter font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <!-- 
+    NOVA MUDANÇA: 
+    Adicionamos IDs ao container de status, ao ponto e ao texto.
+    Também adicionamos um input escondido para guardar o status inicial.
+  -->
+  <header class="topbar">
+    <div class="dots" aria-hidden="true">
+      <span></span><span></span><span></span>
+    </div>
+    <!-- Ocultado por padrão via CSS, controlado via JS -->
+    <div class="status" id="status-container"> 
+      <span class="dot" id="status-dot"></span>
+      <span id="status-text"></span>
+    </div>
+    <!-- Guarda o status vindo do servidor para o JS ler -->
+    <input type="hidden" id="initial-status" value="{{ status_text or 'CONNECTING' }}">
+  </header>
+
+  <main class="shell">
+    <!-- Título + subtítulo -->
+    <section class="hero">
+      <div class="brand">
+        <div class="logo">
+          <!-- Ícone de robô (robozinho) -->
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 2v2M7 22h10M5 20V9a7 7 0 0 1 14 0v11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <circle cx="9" cy="12" r="1.4" fill="currentColor"/>
+            <circle cx="15" cy="12" r="1.4" fill="currentColor"/>
+          </svg>
+        </div>
+        <!-- NOVO H1 -->
+        <h1>chatbot ACHE</h1>
+      </div>
+      <p class="sub">Faça perguntas e peça cálculos sobre seus dados!</p>
+    </section>
+
+    <!-- Janela do chat -->
+    <section id="chat-window" class="chat-window">
+      <!-- Mensagens renderizadas pelo servidor (no carregamento da página) -->
+      {% for message in messages %}
+        <div class="row {{ message.role }}">
+          <div class="bubble">
+            <div class="bubble-inner">
+              <div class="bubble-icon {{ message.role }}">
+                {% if message.role == 'user' %}
+                <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                  <path fill="currentColor" d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12h2a8 8 0 1 1 8 8v2c5.52 0 10-4.48 10-10S17.52 2 12 2zm-1 14h2v-6h-2v6z"/>
+                </svg>
+                {% else %}
+                <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                  <path fill="currentColor" d="M12 2a5 5 0 0 0-5 5v3H5a1 1 0 0 0-1 1v7h16v-7a1 1 0 0 0-1-1h-2V7a5 5 0 0 0-5-5Zm-3 8V7a3 3 0 1 1 6 0v3H9Z"/>
+                </svg>
+                {% endif %}
+              </div>
+              <div class="bubble-text">{{ message.content }}</div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+      <!-- Novas mensagens serão adicionadas aqui pelo script.js -->
+    </section>
+
+    <!-- Composer (input) estilo pílula rosinha -->
+    <section class="composer-wrap">
+      <form id="chat-form" class="composer" autocomplete="off">
+        <!-- NOVO PLACEHOLDER -->
+        <input type="text" id="message-input" placeholder="quantas tarefas tem a condição sempre?" required />
+        <button type="submit" id="send-button" aria-label="Enviar">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+            <path fill="currentColor" d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/>
+          </svg>
+        </button>
+      </form>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
+

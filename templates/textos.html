@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <title>Texto Instrucional</title>
+  <style>
+    body {
+      background: linear-gradient(150deg, #fde4e4 35%, #fff 60%, #b71356 100%);
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #b71356;
+    }
+    header {
+      background-color: #b71356;
+      color: #fff;
+      padding: 38px 0 18px 0;
+      text-align: center;
+      box-shadow: 0 3px 18px #fde4e4;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2.5em;
+      letter-spacing: 1px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background-color: #fff;
+      border-radius: 20px;
+      box-shadow: 0 5px 25px #f68fb4;
+      padding: 40px 30px;
+      text-align: center;
+    }
+    .instruction-icon {
+      font-size: 3em;
+      color: #b71356;
+      margin-bottom: 20px;
+    }
+    .step {
+      background: #fde4e4;
+      margin: 18px auto;
+      border-radius: 10px;
+      padding: 14px 12px;
+      border-left: 5px solid #b71356;
+      color: #b71356;
+      width: 80%;
+      font-size: 1.05em;
+      text-align: left;
+    }
+    .button {
+      background-color: #f68fb4;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 13px 40px;
+      font-size: 1.1em;
+      margin-top: 28px;
+      cursor: pointer;
+      transition: background .3s;
+    }
+    .button:hover {
+      background-color: #b71356;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Texto Instrucional</h1>
+    <p>
+      Esta página fornecerá o texto de "como fazer" para:
+      <strong id="subtitulo-tarefa">—</strong>
+    </p>
+  </header>
+
+  <div class="container">
+    <div class="instruction-icon">📝</div>
+    <h2>Instruções</h2>
+    <div class="step">1. Leia o título e identifique o objetivo do texto.</div>
+    <div class="step">2. Siga atentamente cada orientação listada.</div>
+    <div class="step">3. Caso haja dúvidas, consulte o chatbot ou um supervisor.</div>
+    <button class="button">Acessar Texto</button>
+  </div>
+
+    <!-- dentro do .container, logo abaixo do <h2> ou antes do botão -->
+  <div id="task-meta" style="background:#fde4e4;border-left:5px solid #b71356;border-radius:10px;padding:12px 14px;margin:10px 0;text-align:left;color:#b71356;font-weight:600">
+    <!-- preenchido via JS -->
+  </div>
+
+  <script>
+    (function(){
+      const q = new URLSearchParams(location.search);
+      const numero = q.get('numero') || '—';
+      const nome   = q.get('nome') || '—';
+      const fase   = q.get('fase') || '—';
+      const cat    = q.get('categoria') || '—';
+      const sheet  = q.get('sheet') || '—';
+      const el = document.getElementById('task-meta');
+      if (el) {
+        el.textContent = `Tarefa selecionada: Nº ${numero} • ${nome} • ${fase} • ${cat} • Aba: ${sheet}`;
+      }
+    })();
+  </script>
+
+  <script>
+    (function(){
+      const q = new URLSearchParams(location.search);
+      const nome = (q.get('nome') || '').trim();
+      const alvo = document.getElementById('subtitulo-tarefa');
+      if (alvo) alvo.textContent = nome || '—';
+
+      // Se você tiver aquela faixa "task-meta" mostrando tudo,
+      // esconda-a para ficar só com o subtítulo:
+      const meta = document.getElementById('task-meta');
+      if (meta) meta.style.display = 'none';
+    })();
+  </script>
+
+</body>
+</html>
